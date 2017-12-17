@@ -82,15 +82,13 @@ class QLearningAgent(ReinforcementAgent):
         if not legalactions:
             return None
 
-        #COPIED >>>>>>
-        for action in legalactions:
-    	    counter[action] = self.getQValue(state, action)
+        for legalaction in legalactions:
+    	    counter[legalaction] = self.getQValue(state, legalaction)
     
-        if counter.totalCount() == 0:
-    	    return random.choice(legalactions)
-        else:
-    	    return counter.argMax()
-        #COPIED <<<<<<
+        if counter.totalCount() != 0:
+    	    return counter.argMax() 
+        
+    	return random.choice(legalactions)
 
     def getAction(self, state):
         """
@@ -122,8 +120,9 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
         currentQValue = self.getQValue(state, action)
+        nextValue = self.discount * self.getValue(nextState) - self.getQValue(state, action)
 
-        self.seenstates[(state, action)] =  currentQValue + self.alpha * (reward + self.discount * self.getValue(nextState) - self.getQValue(state, action))
+        self.seenstates[(state, action)] =  currentQValue + (reward + nextValue) * self.alpha
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
